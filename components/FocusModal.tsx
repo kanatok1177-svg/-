@@ -11,13 +11,21 @@ const TOTAL_SEC = 60;
 
 interface FocusModalProps {
   task?: string;
+  streak: number;
+  todayCount: number;
   onClose: () => void;
   onComplete: (task: string | undefined, durationSec: number) => void;
 }
 
 type Phase = "counting" | "achieved";
 
-export default function FocusModal({ task, onClose, onComplete }: FocusModalProps) {
+export default function FocusModal({
+  task,
+  streak,
+  todayCount,
+  onClose,
+  onComplete,
+}: FocusModalProps) {
   const [phase, setPhase] = useState<Phase>("counting");
   const [remaining, setRemaining] = useState(TOTAL_SEC);
   const [saved, setSaved] = useState(false);
@@ -93,6 +101,8 @@ export default function FocusModal({ task, onClose, onComplete }: FocusModalProp
         <AchievedView
           task={task}
           saved={saved}
+          streak={streak}
+          todayCount={todayCount}
           onContinue={onClose}
           onSave={handleSave}
         />

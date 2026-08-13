@@ -57,6 +57,8 @@ export default function HomePage() {
       {session ? (
         <FocusModal
           task={session.task}
+          streak={streak}
+          todayCount={today}
           onClose={handleCloseModal}
           onComplete={handleCompleteLog}
         />

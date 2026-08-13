@@ -1,10 +1,12 @@
 "use client";
 
-import { PartyPopper, Check, ArrowRight } from "lucide-react";
+import { PartyPopper, Check, ArrowRight, Flame, Sparkles } from "lucide-react";
 
 interface AchievedViewProps {
   task?: string;
   saved: boolean;
+  streak: number;
+  todayCount: number;
   onContinue: () => void;
   onSave: () => void;
 }
@@ -12,6 +14,8 @@ interface AchievedViewProps {
 export default function AchievedView({
   task,
   saved,
+  streak,
+  todayCount,
   onContinue,
   onSave,
 }: AchievedViewProps) {
@@ -28,6 +32,21 @@ export default function AchievedView({
           <p className="mt-2 max-w-xs truncate rounded-full bg-white/5 px-4 py-2 text-xs text-white/50">
             {task}
           </p>
+        ) : null}
+
+        {saved ? (
+          <div className="mt-3 flex animate-scale-in items-center gap-2">
+            <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+              <Flame size={14} strokeWidth={2.5} className="text-orange-400" />
+              <span className="text-[11px] text-white/50">ストリーク</span>
+              <span className="text-xs font-bold text-white">{streak}日</span>
+            </span>
+            <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+              <Sparkles size={14} strokeWidth={2.5} className="text-accent-soft" />
+              <span className="text-[11px] text-white/50">今日</span>
+              <span className="text-xs font-bold text-white">{todayCount}回</span>
+            </span>
+          </div>
         ) : null}
       </div>
 

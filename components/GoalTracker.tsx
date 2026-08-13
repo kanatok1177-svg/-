@@ -112,6 +112,7 @@ function GoalCreateForm() {
 function ActiveGoal({ goal }: { goal: Goal }) {
   const today = todayISODate();
   const checkedToday = goal.checkedDates.includes(today);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const streak = useMemo(() => calculateStreak(goal.checkedDates, today), [goal.checkedDates, today]);
   const success = streak >= goal.targetDays;
@@ -131,11 +132,9 @@ function ActiveGoal({ goal }: { goal: Goal }) {
     });
   }
 
-  function handleReset() {
-    if (typeof window !== "undefined" && !window.confirm("この目標を削除して、新しい目標をやり直しますか?")) {
-      return;
-    }
+  function handleConfirmDelete() {
     setGoal(null);
+    setConfirmingDelete(false);
   }
 
   return (
@@ -147,7 +146,7 @@ function ActiveGoal({ goal }: { goal: Goal }) {
         </div>
         <button
           type="button"
-          onClick={handleReset}
+          onClick={() => setConfirmingDelete(true)}
           aria-label="目標を削除する"
           className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
         >
@@ -160,6 +159,28 @@ function ActiveGoal({ goal }: { goal: Goal }) {
           </svg>
         </button>
       </div>
+
+      {confirmingDelete && (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-red-50 px-3 py-2.5">
+          <span className="text-sm font-medium text-red-700">この目標を削除しますか?</span>
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              onClick={() => setConfirmingDelete(false)}
+              className="rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-500 hover:bg-white"
+            >
+              キャンセル
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              className="rounded-lg bg-red-500 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-600"
+            >
+              削除する
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 flex flex-col items-center gap-4">
         <GoalRing progress={progress} success={success}>

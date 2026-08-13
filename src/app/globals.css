@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f5;
+  --foreground: #2b2b2b;
+  --surface: #ffffff;
+  --surface-muted: #f4f1ec;
+  --border: #e7e2d9;
+  --accent: #d97757;
+  --accent-strong: #c15f3f;
+  --accent-soft: #f6ddd2;
+  --muted: #8a8378;
+  --danger: #b3543f;
+  --shadow-color: 220 20% 40%;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-muted: var(--muted);
+  --color-danger: var(--danger);
+  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI",
+    "Yu Gothic", "Noto Sans JP", "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1815;
+    --foreground: #f1ede6;
+    --surface: #24211d;
+    --surface-muted: #2c2822;
+    --border: #3a352c;
+    --accent: #e08a63;
+    --accent-strong: #f0a077;
+    --accent-soft: #3d2c22;
+    --muted: #a49a8c;
+    --danger: #e08a72;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+}

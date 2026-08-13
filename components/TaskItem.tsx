@@ -10,7 +10,7 @@ type TaskItemProps = {
 
 export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
   return (
-    <li className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-indigo-200 hover:shadow-md">
+    <li className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-indigo-200 hover:shadow-md">
       <button
         type="button"
         onClick={() => onToggle(task.id)}
@@ -39,7 +39,7 @@ export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
         type="button"
         onClick={() => onDelete(task.id)}
         aria-label="削除"
-        className="shrink-0 rounded-lg p-1.5 text-slate-300 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 focus-visible:opacity-100"
+        className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
           <polyline points="3 6 5 6 21 6" />

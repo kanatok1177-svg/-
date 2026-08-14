@@ -137,10 +137,10 @@ export default function CalculatePage() {
           <Card>
             <p className="mb-1 text-sm font-semibold">起床・就寝</p>
             <p className="mb-3 text-xs text-[var(--muted)]">
-              就寝が起床より前の時刻なら、日をまたぐものとして計算します。
+              今日の0:00〜起床までと、就寝〜24:00までを睡眠時間として計算します。
             </p>
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm font-medium">起床時間</span>
+              <span className="text-sm font-medium">起床まで</span>
               <input
                 type="time"
                 value={wake}
@@ -149,7 +149,7 @@ export default function CalculatePage() {
               />
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm font-medium">就寝時間</span>
+              <span className="text-sm font-medium">就寝から</span>
               <input
                 type="time"
                 value={sleep}
@@ -157,6 +157,11 @@ export default function CalculatePage() {
                 className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm tabular-nums"
               />
             </div>
+            {detailedResult.crossesMidnight && (
+              <p className="mt-2 rounded-xl bg-[var(--warn-soft)] px-3 py-2 text-xs text-[var(--warn)]">
+                就寝が起床と同じか前の時刻なので、今日は寝ないものとして24:00まで計算します。日をまたいだ後ろの時間は、翌日に「起床まで」を入力して計算してください。
+              </p>
+            )}
           </Card>
 
           <Card>
@@ -180,7 +185,7 @@ export default function CalculatePage() {
             <div className="flex flex-col gap-3">
               <Card className="flex flex-col gap-1.5 text-sm text-[var(--muted)]">
                 <div className="flex justify-between">
-                  <span>起床〜就寝</span>
+                  <span>起きている時間</span>
                   <span className="font-semibold text-[var(--foreground)]">
                     {formatDuration(detailedResult.awakeMinutes)}
                   </span>
@@ -193,7 +198,7 @@ export default function CalculatePage() {
                 </div>
                 {detailedResult.overBudget && (
                   <p className="pt-1 text-xs text-[var(--danger)]">
-                    予定の合計が起床〜就寝の時間を超えています。自由時間は0分になります。
+                    予定の合計が起きている時間を超えています。自由時間は0分になります。
                   </p>
                 )}
               </Card>

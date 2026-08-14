@@ -70,16 +70,22 @@ export function formatHM(t: string): string {
 }
 
 /**
- * 起床〜就寝の時間から予定を差し引いて自由時間を計算する。
- * 就寝時刻が起床時刻以前（例: 起床7:00, 就寝1:00）の場合は日をまたぐとみなす。
+ * 「起床まで（0:00〜起床）」と「就寝から（就寝〜24:00）」を今日の睡眠時間とみなし、
+ * その日（0:00〜24:00）の中で起きている時間から予定を差し引いて自由時間を計算する。
+ *
+ * 就寝の時刻が起床の時刻と同じか前（例: 起床7:00, 就寝1:00）の場合は、
+ * 「今日中には寝ない（＝日をまたいで翌日に寝る）」とみなし、起床から24:00までを
+ * 起きている時間として扱う。日をまたいだ後ろの時間は翌日の計算に含める。
  */
 export function calculateDetailedFreeTime(
   input: DetailedCalcInput
 ): DetailedCalcResult {
-  const wake = timeStrToMinutes(input.wake);
-  let sleep = timeStrToMinutes(input.sleep);
-  if (sleep <= wake) sleep += 24 * 60;
-  const awakeMinutes = sleep - wake;
+  const wakeMinutes = timeStrToMinutes(input.wake);
+  const sleepMinutes = timeStrToMinutes(input.sleep);
+  const crossesMidnight = sleepMinutes <= wakeMinutes;
+  const awakeMinutes = crossesMidnight
+    ? Math.max(0, 24 * 60 - wakeMinutes)
+    : sleepMinutes - wakeMinutes;
 
   const safe = (n: number) => (Number.isFinite(n) && n > 0 ? Math.round(n) : 0);
   const busyMinutes =
@@ -97,6 +103,7 @@ export function calculateDetailedFreeTime(
     busyMinutes,
     freeMinutes,
     overBudget: busyMinutes > awakeMinutes,
+    crossesMidnight,
   };
 }
 

@@ -62,4 +62,6 @@ export type DetailedCalcResult = {
   busyMinutes: number;
   freeMinutes: number;
   overBudget: boolean;
+  /** 就寝が起床と同じか前の時刻（＝日をまたいで翌日に寝る）場合 true */
+  crossesMidnight: boolean;
 };

@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f7f7;
+  --surface: #ffffff;
+  --surface-2: #f0f1f2;
+  --border: #e5e7e6;
+  --foreground: #16181a;
+  --muted: #767b7f;
+  --accent: #0f9d78;
+  --accent-soft: #e3f5ee;
+  --accent-contrast: #ffffff;
+  --warn: #d97a06;
+  --warn-soft: #fbead2;
+  --danger: #e0563f;
+  --danger-soft: #fbe4de;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #101213;
+    --surface: #191c1d;
+    --surface-2: #212525;
+    --border: #2b2f30;
+    --foreground: #f2f3f3;
+    --muted: #9aa0a1;
+    --accent: #35c795;
+    --accent-soft: #163229;
+    --accent-contrast: #08130f;
+    --warn: #e2a13f;
+    --warn-soft: #362a13;
+    --danger: #e97e69;
+    --danger-soft: #391f19;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-noto-sans-jp), system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100dvh;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}

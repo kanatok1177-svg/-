@@ -16,4 +16,6 @@ export type Goal = {
   createdAt: number;
   /** チェックした日付 (YYYY-MM-DD) の一覧 */
   checkedDates: string[];
+  /** 具体的にやることのメモ(任意) */
+  memo?: string;
 };

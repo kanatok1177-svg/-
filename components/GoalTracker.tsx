@@ -27,6 +27,7 @@ export default function GoalTracker() {
 function GoalCreateForm() {
   const [title, setTitle] = useState("");
   const [targetDays, setTargetDays] = useState(21);
+  const [memo, setMemo] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +40,7 @@ function GoalCreateForm() {
       targetDays,
       createdAt: Date.now(),
       checkedDates: [],
+      memo: memo.trim(),
     };
     setGoal(goal);
   }
@@ -95,6 +97,20 @@ function GoalCreateForm() {
               </button>
             ))}
           </div>
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-slate-600">
+            メモ(具体的にやること)<span className="font-normal text-slate-400">・任意</span>
+          </span>
+          <textarea
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            placeholder="例: 腹筋20回・腕立て10回を寝る前に行う"
+            maxLength={300}
+            rows={2}
+            className="resize-none rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          />
         </label>
 
         <button
@@ -181,6 +197,20 @@ function ActiveGoal({ goal }: { goal: Goal }) {
           </div>
         </div>
       )}
+
+      <label className="mt-4 flex flex-col gap-1.5">
+        <span className="text-xs font-medium text-slate-500">メモ(具体的にやること)</span>
+        <textarea
+          value={goal.memo ?? ""}
+          onChange={(e) =>
+            setGoal((prev) => (prev ? { ...prev, memo: e.target.value } : prev))
+          }
+          placeholder="例: 腹筋20回・腕立て10回を寝る前に行う"
+          maxLength={300}
+          rows={2}
+          className="resize-none rounded-xl border border-slate-200 bg-white/70 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+        />
+      </label>
 
       <div className="mt-6 flex flex-col items-center gap-4">
         <GoalRing progress={progress} success={success}>

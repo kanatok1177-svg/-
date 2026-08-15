@@ -13,6 +13,7 @@ export default function TaskTracker() {
   const tasks = useTasks();
   const [selectedDate, setSelectedDate] = useState<string>(todayISODate());
   const [newTitle, setNewTitle] = useState("");
+  const [count, setCount] = useState(1);
 
   const tasksForDate = useMemo(
     () => tasks.filter((t) => t.date === selectedDate).sort((a, b) => a.createdAt - b.createdAt),
@@ -32,16 +33,19 @@ export default function TaskTracker() {
     const title = newTitle.trim();
     if (!title) return;
 
-    const task: Task = {
+    const now = Date.now();
+    const newTasks: Task[] = Array.from({ length: count }, (_, i) => ({
       id: createId(),
-      title,
+      // 複数件まとめて追加するときは "(1/3)" のように番号を付けて区別できるようにする
+      title: count > 1 ? `${title} (${i + 1}/${count})` : title,
       date: selectedDate,
       completed: false,
-      createdAt: Date.now(),
-    };
+      createdAt: now + i,
+    }));
 
-    setTasks((prev) => [...prev, task]);
+    setTasks((prev) => [...prev, ...newTasks]);
     setNewTitle("");
+    setCount(1);
   }
 
   function handleToggle(id: string) {
@@ -70,15 +74,27 @@ export default function TaskTracker() {
           <ProgressBar completed={completedCount} total={tasksForDate.length} />
         </div>
 
-        <form onSubmit={handleAddTask} className="mt-6 flex gap-2">
+        <form onSubmit={handleAddTask} className="mt-6 flex flex-wrap gap-2">
           <input
             type="text"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             placeholder="新しいタスクを入力..."
             maxLength={200}
-            className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
           />
+          <div className="flex shrink-0 items-center gap-1 rounded-xl border border-slate-200 bg-white pl-1 pr-2.5 focus-within:ring-2 focus-within:ring-indigo-300">
+            <input
+              type="number"
+              min={1}
+              max={20}
+              value={count}
+              onChange={(e) => setCount(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
+              aria-label="追加する個数"
+              className="w-10 bg-transparent py-2.5 text-center text-sm text-slate-700 focus:outline-none"
+            />
+            <span className="text-xs text-slate-400">個</span>
+          </div>
           <button
             type="submit"
             disabled={!newTitle.trim()}

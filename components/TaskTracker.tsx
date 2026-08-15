@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Task } from "@/lib/types";
 import { useTasks, setTasks } from "@/lib/storage";
-import { todayISODate } from "@/lib/date";
+import { todayISODate, addDays } from "@/lib/date";
 import { createId } from "@/lib/id";
 import DateNav from "@/components/DateNav";
 import ProgressBar from "@/components/ProgressBar";
@@ -26,6 +26,12 @@ export default function TaskTracker() {
   const tasksForDate = useMemo(
     () => tasks.filter((t) => t.date === selectedDate).sort((a, b) => a.createdAt - b.createdAt),
     [tasks, selectedDate]
+  );
+
+  const previousDate = useMemo(() => addDays(selectedDate, -1), [selectedDate]);
+  const previousDateTasks = useMemo(
+    () => tasks.filter((t) => t.date === previousDate).sort((a, b) => a.createdAt - b.createdAt),
+    [tasks, previousDate]
   );
 
   const completedCount = tasksForDate.filter((t) => t.completed).length;
@@ -57,6 +63,21 @@ export default function TaskTracker() {
     setCountInput("1");
   }
 
+  function handleCopyPreviousDay() {
+    if (previousDateTasks.length === 0) return;
+
+    const now = Date.now();
+    const copied: Task[] = previousDateTasks.map((t, i) => ({
+      id: createId(),
+      title: t.title,
+      date: selectedDate,
+      completed: false,
+      createdAt: now + i,
+    }));
+
+    setTasks((prev) => [...prev, ...copied]);
+  }
+
   function handleToggle(id: string) {
     setTasks((prev) =>
       prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
@@ -82,6 +103,20 @@ export default function TaskTracker() {
         <div className="mt-5">
           <ProgressBar completed={completedCount} total={tasksForDate.length} />
         </div>
+
+        {previousDateTasks.length > 0 && (
+          <button
+            type="button"
+            onClick={handleCopyPreviousDay}
+            className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-indigo-200 bg-indigo-50/70 px-3 py-2.5 text-xs font-semibold text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-100"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            前日のタスクをコピー({previousDateTasks.length}件)
+          </button>
+        )}
 
         <form onSubmit={handleAddTask} className="mt-6 flex flex-wrap gap-2">
           <input

@@ -9,11 +9,19 @@ import DateNav from "@/components/DateNav";
 import ProgressBar from "@/components/ProgressBar";
 import TaskItem from "@/components/TaskItem";
 
+function parseCount(raw: string): number {
+  const n = parseInt(raw, 10);
+  if (Number.isNaN(n)) return 1;
+  return Math.max(1, Math.min(20, n));
+}
+
 export default function TaskTracker() {
   const tasks = useTasks();
   const [selectedDate, setSelectedDate] = useState<string>(todayISODate());
   const [newTitle, setNewTitle] = useState("");
-  const [count, setCount] = useState(1);
+  // 個数入力は生の文字列として保持し、確定時(送信・フォーカスアウト)だけ
+  // 1〜20に丸める。value を都度クランプすると "1" を消せなくなるため。
+  const [countInput, setCountInput] = useState("1");
 
   const tasksForDate = useMemo(
     () => tasks.filter((t) => t.date === selectedDate).sort((a, b) => a.createdAt - b.createdAt),
@@ -33,6 +41,7 @@ export default function TaskTracker() {
     const title = newTitle.trim();
     if (!title) return;
 
+    const count = parseCount(countInput);
     const now = Date.now();
     const newTasks: Task[] = Array.from({ length: count }, (_, i) => ({
       id: createId(),
@@ -45,7 +54,7 @@ export default function TaskTracker() {
 
     setTasks((prev) => [...prev, ...newTasks]);
     setNewTitle("");
-    setCount(1);
+    setCountInput("1");
   }
 
   function handleToggle(id: string) {
@@ -88,8 +97,9 @@ export default function TaskTracker() {
               type="number"
               min={1}
               max={20}
-              value={count}
-              onChange={(e) => setCount(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
+              value={countInput}
+              onChange={(e) => setCountInput(e.target.value)}
+              onBlur={() => setCountInput(String(parseCount(countInput)))}
               aria-label="追加する個数"
               className="w-10 bg-transparent py-2.5 text-center text-sm text-slate-700 focus:outline-none"
             />

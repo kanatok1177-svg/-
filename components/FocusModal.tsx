@@ -32,6 +32,7 @@ export default function FocusModal({
   const wakeLock = useWakeLock();
   const startedAtRef = useRef<number>(Date.now());
   const lastTickRef = useRef<number>(TOTAL_SEC);
+  const loggedRef = useRef(false);
 
   // カウントダウン中はスクロールを固定し、Wake Lock を取得する
   useEffect(() => {
@@ -65,6 +66,13 @@ export default function FocusModal({
         clearInterval(interval);
         playFanfare();
         void wakeLock.release();
+        // 60秒達成した時点で自動的に記録する（ボタンの押し忘れでストリークが
+        // 途切れてしまうのを防ぐため）。ボタンで再度呼ばれても二重記録しない。
+        if (!loggedRef.current) {
+          loggedRef.current = true;
+          onComplete(task, TOTAL_SEC);
+          setSaved(true);
+        }
         setPhase("achieved");
       }
     }, 200);
@@ -74,6 +82,8 @@ export default function FocusModal({
   }, [phase]);
 
   const handleSave = () => {
+    if (loggedRef.current) return;
+    loggedRef.current = true;
     onComplete(task, TOTAL_SEC);
     setSaved(true);
   };

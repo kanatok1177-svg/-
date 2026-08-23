@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Reboot | 7日間ドーパミンデトックス</title>
+<meta name="description" content="たった1週間でドーパミン中毒から抜け出すための、7日間の実践プログラムアプリ。" />
+<meta name="theme-color" content="#0e1420" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">🌱</span>
+      <div class="brand-text">
+        <h1>Reboot</h1>
+        <p>7日間ドーパミンデトックス</p>
+      </div>
+    </div>
+    <div class="streak-badge" title="達成した日数">
+      <span id="streakCount">0</span>
+      <small>/7 日</small>
+    </div>
+  </header>
+
+  <main id="views">
+
+    <!-- ============ HOME ============ -->
+    <section id="view-home" class="view active">
+      <div class="card hero-card">
+        <p class="hero-eyebrow" id="homeGreeting">ようこそ</p>
+        <h2 id="homeHeadline">スマホを置いて、脳を取り戻そう。</h2>
+        <p class="hero-sub">通知・SNS・ショート動画に奪われた「集中力」と「満足感」を、7日間で少しずつ取り戻すプログラムです。</p>
+        <button class="btn btn-primary btn-block" id="startBtn">プログラムを始める</button>
+      </div>
+
+      <div class="card progress-card" id="progressCard" hidden>
+        <div class="progress-ring-wrap">
+          <svg class="progress-ring" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="progress-ring-label">
+            <span id="progressDoneCount">0</span><small>/7日</small>
+          </div>
+        </div>
+        <div class="progress-meta">
+          <div class="stat">
+            <span class="stat-value" id="statStreak">0</span>
+            <span class="stat-label">連続達成</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="statSos">0</span>
+            <span class="stat-label">乗り越えた衝動</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="statDay">Day 1</span>
+            <span class="stat-label">今日のテーマ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="todayCard" hidden>
+        <div class="card-head">
+          <span class="pill pill-accent" id="todayDayPill">Day 1</span>
+          <h3 id="todayTitle">気づく</h3>
+        </div>
+        <p class="muted" id="todayGoal"></p>
+        <ul class="mission-preview" id="todayMissionPreview"></ul>
+        <button class="btn btn-secondary btn-block" data-goto="program">今日のミッションを開く</button>
+      </div>
+
+      <div class="card calendar-card" id="calendarCard" hidden>
+        <h3 class="card-title-sm">7日間の記録</h3>
+        <div class="day-dots" id="dayDots"></div>
+      </div>
+
+      <div class="card quote-card">
+        <p class="quote-label">🧠 今日の豆知識</p>
+        <p id="dailyTip">通知音が鳴るたびに、脳は「もしかしたら良いことかも」と予測してドーパミンを出します。中身よりも“予測できないこと”自体が依存を作ります。</p>
+      </div>
+    </section>
+
+    <!-- ============ PROGRAM ============ -->
+    <section id="view-program" class="view">
+      <h2 class="view-title">7日間プログラム</h2>
+      <div class="day-pills" id="dayPills"></div>
+
+      <div class="card day-detail">
+        <div class="card-head">
+          <span class="pill pill-accent" id="dayDetailPill">Day 1</span>
+          <span class="pill pill-ghost" id="dayDetailStatus">未達成</span>
+        </div>
+        <h3 id="dayDetailTitle">気づく</h3>
+        <p class="muted" id="dayDetailGoal"></p>
+
+        <div class="mission-list" id="missionList"></div>
+
+        <div class="tip-box">
+          <p class="tip-label">💡 豆知識 / なぜ効くのか</p>
+          <p id="dayDetailTip"></p>
+        </div>
+
+        <label class="field-label" for="dayReflection">今日の振り返り（任意）</label>
+        <textarea id="dayReflection" class="reflection-input" rows="3" placeholder="今日感じたこと、うまくいったこと・いかなかったことを書いてみましょう"></textarea>
+      </div>
+    </section>
+
+    <!-- ============ SOS ============ -->
+    <section id="view-sos" class="view">
+      <h2 class="view-title">SOS：衝動サーフィン</h2>
+      <p class="muted view-sub">スマホやSNSを触りたい強い衝動は、平均<b>90秒</b>で波のように過ぎ去ります。手を止めて、呼吸に意識を向けてみましょう。</p>
+
+      <div class="card sos-card">
+        <div class="breath-ring-wrap" id="breathWrap">
+          <svg class="breath-ring" viewBox="0 0 200 200">
+            <circle class="breath-ring-bg" cx="100" cy="100" r="88"></circle>
+            <circle class="breath-ring-fg" id="breathRingFg" cx="100" cy="100" r="88"></circle>
+          </svg>
+          <div class="breath-center">
+            <span id="breathTime">90</span>
+            <small id="breathPhase">タップして開始</small>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="sosStartBtn">衝動が来た！90秒待つ</button>
+        <button class="btn btn-ghost btn-block" id="sosCancelBtn" hidden>キャンセル</button>
+
+        <div class="sos-done" id="sosDone" hidden>
+          <p class="sos-done-title">🎉 波を乗り越えました！</p>
+          <p class="muted">何を触りたくなりましたか？記録しておくと、パターンに気づきやすくなります。</p>
+          <div class="chip-row" id="sosTriggerChips">
+            <button class="chip" data-trigger="SNS">SNS</button>
+            <button class="chip" data-trigger="動画">動画</button>
+            <button class="chip" data-trigger="ゲーム">ゲーム</button>
+            <button class="chip" data-trigger="ニュース">ニュース</button>
+            <button class="chip" data-trigger="その他">その他</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title-sm">これまでの記録</h3>
+        <div id="sosHistory" class="sos-history">
+          <p class="muted empty-hint">まだ記録がありません。衝動を乗り越えるたびにここに積み上がっていきます。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ JOURNAL ============ -->
+    <section id="view-journal" class="view">
+      <h2 class="view-title">記録</h2>
+
+      <div class="card summary-card">
+        <div class="summary-row">
+          <span>開始日</span>
+          <strong id="journalStart">未開始</strong>
+        </div>
+        <div class="summary-row">
+          <span>達成日数</span>
+          <strong id="journalDone">0 / 7 日</strong>
+        </div>
+        <div class="summary-row">
+          <span>乗り越えた衝動</span>
+          <strong id="journalSos">0 回</strong>
+        </div>
+      </div>
+
+      <div id="journalList" class="journal-list"></div>
+
+      <div class="card danger-card">
+        <h3 class="card-title-sm">プログラムをリセット</h3>
+        <p class="muted">すべての記録を消去して、最初からやり直します。</p>
+        <button class="btn btn-danger btn-block" id="resetBtn">リセットする</button>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-item active" data-view="home"><span class="nav-icon">🏠</span><span>ホーム</span></button>
+    <button class="nav-item" data-view="program"><span class="nav-icon">📅</span><span>プログラム</span></button>
+    <button class="nav-item nav-item-sos" data-view="sos"><span class="nav-icon">🆘</span><span>SOS</span></button>
+    <button class="nav-item" data-view="journal"><span class="nav-icon">📝</span><span>記録</span></button>
+  </nav>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

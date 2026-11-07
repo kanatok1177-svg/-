@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type EventItem = {
   id: string;
@@ -9,6 +10,7 @@ type EventItem = {
 };
 
 const STORAGE_KEY = "event-countdown:events";
+const UNDO_WINDOW_MS = 6000;
 
 function todayAtMidnight() {
   const now = new Date();
@@ -55,6 +57,8 @@ export default function CountdownApp() {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [error, setError] = useState("");
+  // Recently deleted events, newest last; each can be restored until the toast times out.
+  const [trash, setTrash] = useState<EventItem[]>([]);
 
   useEffect(() => {
     // One-time sync from the external localStorage store on mount.
@@ -73,6 +77,12 @@ export default function CountdownApp() {
     if (!hydrated) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
   }, [events, hydrated]);
+
+  useEffect(() => {
+    if (trash.length === 0) return;
+    const timer = setTimeout(() => setTrash([]), UNDO_WINDOW_MS);
+    return () => clearTimeout(timer);
+  }, [trash]);
 
   const sortedEvents = useMemo(
     () =>
@@ -100,11 +110,27 @@ export default function CountdownApp() {
   }
 
   function handleDelete(id: string) {
+    const target = events.find((ev) => ev.id === id);
+    if (!target) return;
     setEvents((prev) => prev.filter((ev) => ev.id !== id));
+    setTrash((prev) => [...prev, target]);
   }
 
+  function handleUndo() {
+    const last = trash[trash.length - 1];
+    if (!last) return;
+    setEvents((prev) => [...prev, last]);
+    setTrash((prev) => prev.slice(0, -1));
+  }
+
+  const lastDeleted = trash[trash.length - 1];
+
   return (
-    <div className="w-full max-w-2xl mx-auto px-5 py-12 sm:py-16 flex flex-col gap-10">
+    <div className="w-full max-w-2xl mx-auto px-5 py-8 sm:py-12 flex flex-col gap-10">
+      <div className="flex justify-end">
+        <ThemeToggle />
+      </div>
+
       <header className="flex flex-col items-center gap-2 text-center">
         <span className="text-xs font-medium tracking-widest text-accent uppercase">
           Event Countdown
@@ -221,6 +247,25 @@ export default function CountdownApp() {
           );
         })}
       </section>
+
+      {lastDeleted && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="toast-in fixed inset-x-5 bottom-6 z-10 mx-auto flex max-w-md items-center justify-between gap-4 rounded-2xl bg-foreground px-5 py-3 text-sm text-background shadow-lg"
+        >
+          <span className="min-w-0 truncate">
+            「{lastDeleted.name}」を削除しました
+          </span>
+          <button
+            type="button"
+            onClick={handleUndo}
+            className="shrink-0 rounded-full px-3 py-1 font-bold underline underline-offset-4 transition hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-background"
+          >
+            元に戻す
+          </button>
+        </div>
+      )}
     </div>
   );
 }

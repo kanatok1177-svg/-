@@ -12,6 +12,7 @@
   --muted: #8a8378;
   --danger: #b3543f;
   --shadow-color: 220 20% 40%;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -30,8 +31,10 @@
     sans-serif;
 }
 
+/* Theme: "system" stamps nothing on <html>; an explicit choice stamps
+   data-theme="light" | "dark" (see ThemeToggle / the inline script in layout). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #1a1815;
     --foreground: #f1ede6;
     --surface: #24211d;
@@ -42,6 +45,42 @@
     --accent-soft: #3d2c22;
     --muted: #a49a8c;
     --danger: #e08a72;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #1a1815;
+  --foreground: #f1ede6;
+  --surface: #24211d;
+  --surface-muted: #2c2822;
+  --border: #3a352c;
+  --accent: #e08a63;
+  --accent-strong: #f0a077;
+  --accent-soft: #3d2c22;
+  --muted: #a49a8c;
+  --danger: #e08a72;
+  color-scheme: dark;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.toast-in {
+  animation: toast-in 0.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-in {
+    animation: none;
   }
 }
 

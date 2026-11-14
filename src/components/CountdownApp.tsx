@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import NotificationToggle from "@/components/NotificationToggle";
 import ThemeToggle from "@/components/ThemeToggle";
 
 type EventItem = {
@@ -127,8 +128,11 @@ export default function CountdownApp() {
 
   return (
     <div className="w-full max-w-2xl mx-auto px-5 py-8 sm:py-12 flex flex-col gap-10">
-      <div className="flex justify-end">
-        <ThemeToggle />
+      <div className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2">
+        <NotificationToggle events={events} ready={hydrated} />
+        <div className="col-start-2 row-start-1">
+          <ThemeToggle />
+        </div>
       </div>
 
       <header className="flex flex-col items-center gap-2 text-center">

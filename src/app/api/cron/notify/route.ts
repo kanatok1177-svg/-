@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { json } from "@/lib/push/http";
 import { buildDailyMessage, todayInJst } from "@/lib/push/notify";
-import { sendPush } from "@/lib/push/send";
+import { resolveVapid, sendPush } from "@/lib/push/send";
 import { getStore } from "@/lib/push/store";
 
 const CONCURRENCY = 10;
@@ -23,6 +23,7 @@ export async function GET(request: Request) {
   const store = getStore();
   if (!store) return json({ error: "not_configured" }, 503);
 
+  const vapid = await resolveVapid(store, new URL(request.url).origin);
   const today = todayInJst();
   const ids = await store.ids();
   const summary = { subscribers: ids.length, sent: 0, skipped: 0, removed: 0, failed: 0 };
@@ -41,7 +42,7 @@ export async function GET(request: Request) {
           summary.skipped++;
           return;
         }
-        const result = await sendPush(record.subscription, message);
+        const result = await sendPush(record.subscription, message, vapid);
         if (result.ok) {
           await store.put(id, { ...record, lastNotified: today });
           summary.sent++;

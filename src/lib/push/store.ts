@@ -3,10 +3,16 @@ import { Redis } from "@upstash/redis";
 import type { SubscriptionRecord } from "./types";
 
 const INDEX_KEY = "push:subs";
+const VAPID_KEY = "push:vapid";
 // Records that nobody refreshes (the app is never opened again) expire on their own.
 const TTL_SECONDS = 60 * 60 * 24 * 180;
 
+export type VapidKeys = { publicKey: string; privateKey: string };
+
 export type PushStore = {
+  getVapidKeys(): Promise<VapidKeys | null>;
+  /** Stores the keys only if none exist yet; returns whether this call stored them. */
+  setVapidKeysIfAbsent(keys: VapidKeys): Promise<boolean>;
   get(id: string): Promise<SubscriptionRecord | null>;
   put(id: string, record: SubscriptionRecord): Promise<void>;
   remove(id: string): Promise<void>;
@@ -27,6 +33,12 @@ function redisFromEnv(): Redis | null {
 function redisStore(redis: Redis): PushStore {
   const key = (id: string) => `push:sub:${id}`;
   return {
+    async getVapidKeys() {
+      return (await redis.get<VapidKeys>(VAPID_KEY)) ?? null;
+    },
+    async setVapidKeysIfAbsent(keys) {
+      return (await redis.set(VAPID_KEY, keys, { nx: true })) === "OK";
+    },
     async get(id) {
       return (await redis.get<SubscriptionRecord>(key(id))) ?? null;
     },
@@ -48,7 +60,16 @@ function redisStore(redis: Redis): PushStore {
 function memoryStore(): PushStore {
   const g = globalThis as unknown as { __pushMemoryStore?: Map<string, SubscriptionRecord> };
   const map = (g.__pushMemoryStore ??= new Map());
+  const keysHolder = globalThis as unknown as { __pushMemoryVapid?: VapidKeys };
   return {
+    async getVapidKeys() {
+      return keysHolder.__pushMemoryVapid ?? null;
+    },
+    async setVapidKeysIfAbsent(keys) {
+      if (keysHolder.__pushMemoryVapid) return false;
+      keysHolder.__pushMemoryVapid = keys;
+      return true;
+    },
     async get(id) {
       return map.get(id) ?? null;
     },

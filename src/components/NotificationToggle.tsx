@@ -26,7 +26,6 @@ const SYNC_DEBOUNCE_MS = 800;
 const HINTS: Partial<Record<Status, string>> = {
   "ios-install":
     "iPhone・iPadでは、Safariの共有ボタンから「ホーム画面に追加」したアプリで通知を使えます。",
-  unconfigured: "通知は現在ご利用いただけません（サーバーの設定が未完了です）。",
   denied: "通知がブロックされています。ブラウザのサイト設定で通知を許可してください。",
   off: "オンにすると、イベント名と日付をサーバーに保存し、毎朝9時ごろ前日と当日にお知らせします。",
   on: "毎朝9時ごろ、前日と当日のイベントをお知らせします。",
@@ -42,6 +41,7 @@ export default function NotificationToggle({
 }) {
   const [status, setStatus] = useState<Status>("checking");
   const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [missing, setMissing] = useState<string[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -55,6 +55,7 @@ export default function NotificationToggle({
       const config = await fetchPushConfig();
       if (cancelled) return;
       if (!config.enabled || !config.publicKey) {
+        setMissing(config.missing ?? []);
         setStatus("unconfigured");
         return;
       }
@@ -121,7 +122,11 @@ export default function NotificationToggle({
   if (status === "checking" || status === "unsupported") return null;
 
   const isOn = status === "on";
-  const hint = error || HINTS[status];
+  const unconfiguredHint =
+    "通知は現在ご利用いただけません（サーバーの設定が未完了です" +
+    (missing.length ? `：${missing.join("・")}` : "") +
+    "）。";
+  const hint = error || (status === "unconfigured" ? unconfiguredHint : HINTS[status]);
 
   // Rendered as direct children of the grid in CountdownApp: the button shares the
   // first row with the theme switch, and the hint spans the full width below.

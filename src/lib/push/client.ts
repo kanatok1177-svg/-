@@ -11,7 +11,9 @@ export function detectSupport(): PushSupport {
   return isIos ? "ios-needs-install" : "unsupported";
 }
 
-export async function fetchPushConfig(): Promise<{ enabled: boolean; publicKey?: string }> {
+export type PushConfig = { enabled: boolean; publicKey?: string; missing?: string[] };
+
+export async function fetchPushConfig(): Promise<PushConfig> {
   try {
     const res = await fetch("/api/push/config", { cache: "no-store" });
     if (!res.ok) return { enabled: false };

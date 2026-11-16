@@ -1,6 +1,6 @@
 import { json, readJson } from "@/lib/push/http";
 import { NOTIFICATION_TITLE } from "@/lib/push/notify";
-import { getVapidConfig, sendPush } from "@/lib/push/send";
+import { resolveVapid, sendPush } from "@/lib/push/send";
 import { getStore, subscriberId } from "@/lib/push/store";
 import { parseEvents, parseSubscription } from "@/lib/push/validate";
 
@@ -8,7 +8,7 @@ import { parseEvents, parseSubscription } from "@/lib/push/validate";
 // With `welcome: true` it also sends a confirmation push, so a broken setup shows up immediately.
 export async function POST(request: Request) {
   const store = getStore();
-  if (!store || !getVapidConfig()) return json({ error: "not_configured" }, 503);
+  if (!store) return json({ error: "not_configured" }, 503);
 
   const body = await readJson(request);
   if (!body) return json({ error: "bad_request" }, 400);
@@ -26,10 +26,15 @@ export async function POST(request: Request) {
   });
 
   if (body.welcome === true) {
-    const result = await sendPush(subscription, {
-      title: NOTIFICATION_TITLE,
-      body: "通知をオンにしました。毎朝9時ごろ、前日と当日のイベントをお知らせします。",
-    });
+    const vapid = await resolveVapid(store, new URL(request.url).origin);
+    const result = await sendPush(
+      subscription,
+      {
+        title: NOTIFICATION_TITLE,
+        body: "通知をオンにしました。毎朝9時ごろ、前日と当日のイベントをお知らせします。",
+      },
+      vapid
+    );
     if (!result.ok) {
       await store.remove(id);
       return json({ error: "push_failed" }, 502);

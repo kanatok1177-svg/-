@@ -11,14 +11,17 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(digest(a), digest(b));
 }
 
-// Called once a day by Vercel Cron (see vercel.json). Vercel sends
-// `Authorization: Bearer $CRON_SECRET` when the CRON_SECRET env var is set.
+// Called once a day by Vercel Cron (see vercel.json).
+// With CRON_SECRET set, Vercel sends `Authorization: Bearer $CRON_SECRET` and anything else is
+// rejected. Without it (the zero-setup default for a personal app) only Vercel Cron's user agent
+// is accepted. That is not a secret, but the job is idempotent per day and only ever sends the
+// stored events' own reminders, so a stray call cannot do more than send today's reminder early.
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return json({ error: "CRON_SECRET is not set" }, 500);
-  if (!safeEqual(request.headers.get("authorization") ?? "", `Bearer ${secret}`)) {
-    return json({ error: "unauthorized" }, 401);
-  }
+  const authorized = secret
+    ? safeEqual(request.headers.get("authorization") ?? "", `Bearer ${secret}`)
+    : (request.headers.get("user-agent") ?? "").startsWith("vercel-cron/");
+  if (!authorized) return json({ error: "unauthorized" }, 401);
 
   const store = getStore();
   if (!store) return json({ error: "not_configured" }, 503);

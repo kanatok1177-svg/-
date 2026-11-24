@@ -5,11 +5,8 @@ import { getStore } from "@/lib/push/store";
 // Tells the client whether push is set up on this deployment, and the public key to subscribe with.
 // When something is missing it names the setting (never a value) so the owner can fix it.
 export async function GET(request: Request) {
-  const missing: string[] = [];
   const store = getStore();
-  if (!store) missing.push("Redis");
-  if (!process.env.CRON_SECRET) missing.push("CRON_SECRET"); // the daily job cannot run without it
-  if (!store || missing.length > 0) return json({ enabled: false, missing });
+  if (!store) return json({ enabled: false, missing: ["Redis"] });
 
   try {
     const vapid = await resolveVapid(store, new URL(request.url).origin);
